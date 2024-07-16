@@ -1,9 +1,14 @@
-import { ActionGetResponse, ActionPostRequest, ActionPostResponse, ACTIONS_CORS_HEADERS } from "@solana/actions";
-import { headers } from "next/headers";
+import {
+  ActionGetResponse,
+  ActionPostRequest,
+  ActionPostResponse,
+  ACTIONS_CORS_HEADERS,
+} from "@solana/actions";
+import { PublicKey } from "@solana/web3.js";
 export const GET = async (request: Request) => {
   try {
     const requestURL = new URL(request.url);
-    console.log("REQ",  new URL(requestURL.origin).toString());
+    console.log("REQ", new URL(requestURL.origin).toString());
     const payload: ActionGetResponse = {
       title: "How to sell digital products with Solana Blinks.",
       icon: new URL("/cover.jpg", new URL(requestURL.origin)).toString(),
@@ -30,7 +35,7 @@ export const GET = async (request: Request) => {
     let errorMessage = "Something went wrong.";
     if (typeof error == "string") {
       errorMessage = error;
-      return new Response(errorMessage, {
+      return Response.json(errorMessage, {
         status: 400,
         headers: ACTIONS_CORS_HEADERS,
       });
@@ -41,29 +46,75 @@ export const GET = async (request: Request) => {
 export const OPTIONS = GET;
 
 export const POST = async (request: Request) => {
+  try {
+    const requestUrl = new URL(request.url);
+
+    let amount: string | null = requestUrl.searchParams.get("amount");
+    let email: string | null = requestUrl.searchParams.get("email");
+
     try {
-        const requestUrl = new URL(request.url);
-        
-        let amount:String | null = requestUrl.searchParams.get("amount");; 
-        let email: String | null = requestUrl.searchParams.get("email");;
-
-        const requestBody: ActionPostRequest = await request.json();
-        console.log(requestBody.account, requestUrl, amount, email);
-
-        const payload: ActionPostResponse = {
-          transaction: requestBody.account,
-          message: "Sucess"
-          
-        }
-        return Response.json( payload, {headers: ACTIONS_CORS_HEADERS})
-      } catch (error) {
-      let errorMessage = "Something went wrong.";
-        if (typeof error == "string") {
-          errorMessage = error;
-          return new Response(errorMessage, {
-            status: 400,
-            headers: ACTIONS_CORS_HEADERS,
-          });
-        }
+      if (!email || !amount) {
+        throw "Email address is invalid";
       }
+    } catch (error) {
+      let errorMessage = "Something went wrong.";
+      console.log("ERROR", error);
+      if (typeof error == "string") {
+        errorMessage = error;
+        return Response.json(errorMessage, {
+          status: 400,
+          headers: ACTIONS_CORS_HEADERS,
+        });
+      }
+      return;
+    }
+
+    console.log("PASSED")
+    //CHECK IF EMAIL IS VALID
+    const isEmailValid = isValidEmail(email);
+
+    if(!isEmailValid) {
+      throw "Invalid email."
+    }
+
+    const requestBody: ActionPostRequest = await request.json();
+
+    let pubKey: PublicKey;
+    // CHECK PUBLIC KEY
+    try {
+      pubKey = new PublicKey(requestBody.account);
+      
+    } catch (error) {
+      return Response.json("Invalid address", {
+        status: 400,
+        headers: ACTIONS_CORS_HEADERS
+      })
+    }
+
+
+
+    console.log(requestBody.account, requestUrl, amount, email);
+
+    const payload: ActionPostResponse = {
+      transaction: requestBody.account,
+      message: "Thanks for the purchase! Please check your email.",
+    };
+
+    return Response.json(payload, { headers: ACTIONS_CORS_HEADERS });
+  } catch (error) {
+    let errorMessage = "Something went wrong.";
+    if (typeof error == "string") {
+      errorMessage = error;
+      return new Response(errorMessage, {
+        status: 400,
+        headers: ACTIONS_CORS_HEADERS,
+      });
+    }
+  }
+};
+
+function isValidEmail(email: string): boolean {
+  // Define a regular expression for validating an Email
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
 }
