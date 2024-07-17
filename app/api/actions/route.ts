@@ -115,6 +115,31 @@ export const POST = async (request: Request) => {
       const connection = new Connection(clusterApiUrl("devnet"), {
         commitment: "confirmed",
       });
+
+      // CHECK USER BALANCE
+      const userBalance = await connection.getBalance(userKey);
+      const userBalanceInSol = userBalance / LAMPORTS_PER_SOL;
+      // const lamportsToSol = 20 / LAMPORTS_PER_SOL;
+      console.log("USERBALCNE", userBalanceInSol);
+
+      if (userBalanceInSol < 1) {
+        try {
+          const signature = await connection.requestAirdrop(
+            userKey,
+            LAMPORTS_PER_SOL
+          );
+          await connection.confirmTransaction(signature);
+
+          const userBalance = await connection.getBalance(userKey);
+          console.log("BALANCE AFTER AIRDROP", userBalance / LAMPORTS_PER_SOL);
+        } catch (error) {
+          return Response.json("Air Drop failed.", {
+            status: 400,
+            headers: ACTIONS_CORS_HEADERS,
+          });
+        }
+      }
+
       const transaction = new Transaction();
       // if(!sellerKey) return;
       transaction.add(
