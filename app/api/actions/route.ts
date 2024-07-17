@@ -3,8 +3,18 @@ import {
   ActionPostRequest,
   ActionPostResponse,
   ACTIONS_CORS_HEADERS,
+  createPostResponse,
 } from "@solana/actions";
-import { PublicKey } from "@solana/web3.js";
+import {
+  clusterApiUrl,
+  Connection,
+  Keypair,
+  LAMPORTS_PER_SOL,
+  PublicKey,
+  sendAndConfirmTransaction,
+  SystemProgram,
+  Transaction,
+} from "@solana/web3.js";
 export const GET = async (request: Request) => {
   try {
     const requestURL = new URL(request.url);
@@ -51,7 +61,8 @@ export const POST = async (request: Request) => {
 
     let amount: string | null = requestUrl.searchParams.get("amount");
     let email: string | null = requestUrl.searchParams.get("email");
-    const sellerPubKey: string | undefined = process.env.NEXT_PUBLIC_SELLER_PUBLIC_KEY;
+    const sellerPubKey: string | undefined =
+      process.env.NEXT_PUBLIC_SELLER_PUBLIC_KEY;
     try {
       if (!email || !amount) {
         throw "Email address is invalid";
@@ -69,12 +80,12 @@ export const POST = async (request: Request) => {
       return;
     }
 
-    console.log("PASSED")
+    console.log("PASSED");
     //CHECK IF EMAIL IS VALID
     const isEmailValid = isValidEmail(email);
 
-    if(!isEmailValid) {
-      throw "Invalid email."
+    if (!isEmailValid) {
+      throw "Invalid email.";
     }
 
     const requestBody: ActionPostRequest = await request.json();
@@ -83,25 +94,52 @@ export const POST = async (request: Request) => {
     // CHECK USER PUBLIC KEY
     try {
       userKey = new PublicKey(requestBody.account);
-      
     } catch (error) {
       return Response.json("Invalid user address", {
         status: 400,
-        headers: ACTIONS_CORS_HEADERS
-      })
+        headers: ACTIONS_CORS_HEADERS,
+      });
     }
 
-    let sellerKey: PublicKey;
-
-    // CHECK SELLER PUB KEY
-    
+    //CREATE TRANSACTION //
     try {
-      if(sellerPubKey) {
-        sellerKey = new PublicKey(sellerPubKey);
-      }else {
-        throw "Invalid seller address"
+      let sellerKey: PublicKey;
+
+      if (!sellerPubKey) {
+        // console.log("SELLER", sellerKey);
+
+        throw "Invalid seller address";
       }
 
+      sellerKey = new PublicKey(sellerPubKey);
+      const connection = new Connection(clusterApiUrl("devnet"));
+      const transaction = new Transaction();
+      const keyPair = new Keypair();
+      // if(!sellerKey) return;
+      transaction.add(
+        SystemProgram.transfer({
+          fromPubkey: userKey,
+          toPubkey: sellerKey,
+          lamports: parseFloat(amount) * LAMPORTS_PER_SOL,
+        })
+      );
+
+      transaction.feePayer = userKey;
+
+      transaction.recentBlockhash = (
+        await connection.getLatestBlockhash()
+      ).blockhash;
+
+      const payload: ActionPostResponse = await createPostResponse({
+        fields: {
+          transaction,
+          message: "Thanks for the purchase! Please check your email.",
+        },
+      });
+
+      
+     
+      return Response.json(payload, { headers: ACTIONS_CORS_HEADERS });
     } catch (error) {
       let errorMessage = "Something went wrong.";
       console.log("ERROR", error);
@@ -111,20 +149,10 @@ export const POST = async (request: Request) => {
           status: 400,
           headers: ACTIONS_CORS_HEADERS,
         });
+      }
     }
-    
-    console.log("SELLER PUB KEY", sellerPubKey);
-
-    //CREATE TRANSACTION //
 
     console.log(requestBody.account, requestUrl, amount, email);
-
-    const payload: ActionPostResponse = {
-      transaction: requestBody.account,
-      message: "Thanks for the purchase! Please check your email.",
-    };
-
-    return Response.json(payload, { headers: ACTIONS_CORS_HEADERS });
   } catch (error) {
     let errorMessage = "Something went wrong.";
     if (typeof error == "string") {
