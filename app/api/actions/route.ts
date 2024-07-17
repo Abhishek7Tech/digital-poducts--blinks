@@ -163,9 +163,15 @@ export const POST = async (request: Request) => {
         },
       });
       try {
-        connection.onAccountChange(sellerKey, (e) =>
-          console.log("RECHARGED", e.lamports / LAMPORTS_PER_SOL)
-        );
+        // const sellerPubKey = new PublicKey(sellerKey)
+        const sellAccountBalance = await connection.getBalance(sellerKey);
+        const sellAccountBalanceToSol = sellAccountBalance / LAMPORTS_PER_SOL;
+        connection.onAccountChange(sellerKey, (acc) => {
+          const currentSellerAccountBalance = acc.lamports / LAMPORTS_PER_SOL;
+          if (currentSellerAccountBalance > sellAccountBalanceToSol) {
+            console.log("PAYMENT DONE BY", userKey.toString());
+          }
+        });
       } catch (error) {
         console.log("STATUS ERROR", error);
       }
