@@ -112,9 +112,10 @@ export const POST = async (request: Request) => {
       }
 
       sellerKey = new PublicKey(sellerPubKey);
-      const connection = new Connection(clusterApiUrl("devnet"));
+      const connection = new Connection(clusterApiUrl("devnet"), {
+        commitment: "confirmed",
+      });
       const transaction = new Transaction();
-      const keyPair = new Keypair();
       // if(!sellerKey) return;
       transaction.add(
         SystemProgram.transfer({
@@ -136,9 +137,13 @@ export const POST = async (request: Request) => {
           message: "Thanks for the purchase! Please check your email.",
         },
       });
-
-      
-     
+      try {
+        connection.onAccountChange(sellerKey, (e) =>
+          console.log("RECHARGED", e.lamports / LAMPORTS_PER_SOL)
+        );
+      } catch (error) {
+        console.log("STATUS ERROR", error);
+      }
       return Response.json(payload, { headers: ACTIONS_CORS_HEADERS });
     } catch (error) {
       let errorMessage = "Something went wrong.";
