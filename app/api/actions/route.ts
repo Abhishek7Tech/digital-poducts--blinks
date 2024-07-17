@@ -51,7 +51,7 @@ export const POST = async (request: Request) => {
 
     let amount: string | null = requestUrl.searchParams.get("amount");
     let email: string | null = requestUrl.searchParams.get("email");
-
+    const sellerPubKey: string | undefined = process.env.NEXT_PUBLIC_SELLER_PUBLIC_KEY;
     try {
       if (!email || !amount) {
         throw "Email address is invalid";
@@ -79,19 +79,43 @@ export const POST = async (request: Request) => {
 
     const requestBody: ActionPostRequest = await request.json();
 
-    let pubKey: PublicKey;
-    // CHECK PUBLIC KEY
+    let userKey: PublicKey;
+    // CHECK USER PUBLIC KEY
     try {
-      pubKey = new PublicKey(requestBody.account);
+      userKey = new PublicKey(requestBody.account);
       
     } catch (error) {
-      return Response.json("Invalid address", {
+      return Response.json("Invalid user address", {
         status: 400,
         headers: ACTIONS_CORS_HEADERS
       })
     }
 
+    let sellerKey: PublicKey;
 
+    // CHECK SELLER PUB KEY
+    
+    try {
+      if(sellerPubKey) {
+        sellerKey = new PublicKey(sellerPubKey);
+      }else {
+        throw "Invalid seller address"
+      }
+
+    } catch (error) {
+      let errorMessage = "Something went wrong.";
+      console.log("ERROR", error);
+      if (typeof error == "string") {
+        errorMessage = error;
+        return Response.json(errorMessage, {
+          status: 400,
+          headers: ACTIONS_CORS_HEADERS,
+        });
+    }
+    
+    console.log("SELLER PUB KEY", sellerPubKey);
+
+    //CREATE TRANSACTION //
 
     console.log(requestBody.account, requestUrl, amount, email);
 
