@@ -3,9 +3,9 @@ import SMTPTransport from "nodemailer/lib/smtp-transport";
 import Mail from "nodemailer/lib/mailer";
 
 const transport = nodemailer.createTransport({
-  // service: "gmail",
-  port: 465,
-    host: "smtp.gmail.com",
+  service: "gmail",
+  host: process.env.NEXT_PUBLIC_MAILTRAP_HOST,
+  port: 2525,
   auth: {
     user: process.env.NEXT_PUBLIC_SELLER_EMAIL_ADDRESS,
     pass: process.env.NEXT_PUBLIC_NODEMAILER_PASSWORD,
@@ -33,25 +33,27 @@ export const SendToUser = async (dto: UserSendEmailDto) => {
         resolve(success);
       }
     });
-  });
-
-  await new Promise((resolve, reject) => {
-    transport.sendMail(
-      {
-        from: sender,
-        to: receipients,
-        subject,
-        html: message,
-      },
-      (err, info) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(info);
+  }).then(async () => {
+    await new Promise((resolve, reject) => {
+      transport.sendMail(
+        {
+          from: sender,
+          to: receipients,
+          subject,
+          html: message,
+        },
+        (err, info) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(info);
+          }
         }
-      }
-    );
-  });
+      );
+    });
+
+  })
+
 
   
 };
