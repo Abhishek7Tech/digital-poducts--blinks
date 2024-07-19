@@ -194,8 +194,7 @@ export const POST = async (request: Request) => {
                                         <p>Hello,</p>
                                         <p>Thank you for purchasing <strong>${productName}</strong> </p>
                                         <div style={{ padding: '8px 16px', display: 'flex', flexDirection: 'column' }}>
-                                            <p style={{ fontFamily: 'monospace' }}>You can download your e-book here 👉: <a href=${productLink} download style={{ margin: '4px auto' }}>click here</a> </p>
-                                            
+                                            <p style={{ fontFamily: 'monospace' }}>You can download your e-book here 👉: <a href=${productLink} download style={{ margin: '4px auto' }}>click here</a> </p>   
                                         </div>
                                         <p>Thank you once again for your purchase!</p>
                                         <p>If you have any questions or need further assistance, reach us out at <strong>${senderEmail}</strong>.</p>
@@ -224,44 +223,47 @@ export const POST = async (request: Request) => {
             }
             //EMAIL FOR SELLER
 
-            try {
-              if (!senderName || !senderEmail) return;
-              const sender = {
-                name: senderName,
-                address: senderEmail,
-              };
+            // try {
+            //   if (!senderName || !senderEmail) return;
+            //   const sender = {
+            //     name: senderName,
+            //     address: senderEmail,
+            //   };
 
-              const messageTemplate = `<div style={{ padding: '8px' }}>
-                                        <p>Hello,</p>
-                                        <p>Your digital product <strong>${productName}</strong> made a sale.</p>
-                                        <div style={{ padding: '8px 16px', display: 'flex', flexDirection: 'column' }}>
-                                            <p style={{ fontFamily: 'monospace' }}>You can find the user details below 👇:</p>
-                                            <p><strong>User email :</strong> <strong>${email}</strong>
-                                            <p><strong>User wallet address : </strong> <strong>${requestBody.account}</strong>
-                                        </div>
-                                        <p>Congratulations! 🥳</p>
+            //   const messageTemplate = `<div style={{ padding: '8px' }}>
+            //                             <p>Hello,</p>
+            //                             <p>Your digital product <strong>${productName}</strong> made a sale.</p>
+            //                             <div style={{ padding: '8px 16px', display: 'flex', flexDirection: 'column' }}>
+            //                                 <p style={{ fontFamily: 'monospace' }}>You can find the user details below 👇:</p>
+            //                                 <p><strong>User email :</strong> <strong>${email}</strong>
+            //                                 <p><strong>User wallet address : </strong> <strong>${requestBody.account}</strong>
+            //                             </div>
+            //                             <p>Congratulations! 🥳</p>
                                         
-                                    </div>
-                                    `;
-              const subject = "You made a sale. 🥳🥳";
+            //                         </div>
+            //                         `;
+            //   const subject = "You made a sale. 🥳🥳";
 
-              const response = await sendToSeller({
-                sender,
-                receipient: senderEmail,
-                subject,
-                message: messageTemplate,
-              });
+            //   const response = await sendToSeller({
+            //     sender,
+            //     receipient: senderEmail,
+            //     subject,
+            //     message: messageTemplate,
+            //   });
 
-              return Response.json(response.accepted, {
-                headers: ACTIONS_CORS_HEADERS,
-              });
+            //   console.log("RESPONSE ACCEPTED-2", response.accepted);
+            //   console.log("RESPONSE REJECTED-2", response.rejected);
 
-            } catch (error) {
-              Response.json("Failed to send sale notification.", {
-                status: 400,
-                headers: ACTIONS_CORS_HEADERS,
-              });
-            }
+            //   return Response.json(response.accepted, {
+            //     headers: ACTIONS_CORS_HEADERS,
+            //   });
+
+            // } catch (error) {
+            //   Response.json("Failed to send sale notification.", {
+            //     status: 400,
+            //     headers: ACTIONS_CORS_HEADERS,
+            //   });
+            // }
           }
         });
       } catch (error) {
