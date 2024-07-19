@@ -16,7 +16,7 @@ import {
   SystemProgram,
   Transaction,
 } from "@solana/web3.js";
-import { sendToSeller, SendToUser } from "@/app/api/email/nodemailer";
+import { SendToUser } from "@/app/api/email/nodemailer";
 
 export const GET = async (request: Request) => {
   try {

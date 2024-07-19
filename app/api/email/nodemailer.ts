@@ -1,6 +1,7 @@
 import nodemailer from "nodemailer";
 import SMTPTransport from "nodemailer/lib/smtp-transport";
 import Mail from "nodemailer/lib/mailer";
+import { ACTIONS_CORS_HEADERS } from "@solana/actions";
 
 type UserSendEmailDto = {
   sender: Mail.Address;
@@ -11,8 +12,9 @@ type UserSendEmailDto = {
 
 export const SendToUser = async (dto: UserSendEmailDto) => {
   const transport = nodemailer.createTransport({
-    host: process.env.NEXT_PUBLIC_SMTP_HOST,
-    port: parseInt(process.env.NEXT_PUBLIC_SMTP_PORT || "465"),
+  service:"gmail",
+    // host: process.env.NEXT_PUBLIC_SMTP_HOST,
+    // port: parseInt(process.env.NEXT_PUBLIC_SMTP_PORT || "465"),
     auth: {
       user: process.env.NEXT_PUBLIC_SELLER_EMAIL_ADDRESS,
       pass: process.env.NEXT_PUBLIC_NODEMAILER_PASSWORD,
@@ -44,8 +46,11 @@ export const SendToUser = async (dto: UserSendEmailDto) => {
         (err, info) => {
           if (err) {
             reject(err);
+            return Response.json("Something went wrong", {headers: ACTIONS_CORS_HEADERS})
+
           } else {
             resolve(info);
+            return Response.json("Delivered", {headers: ACTIONS_CORS_HEADERS})
           }
         }
       );
