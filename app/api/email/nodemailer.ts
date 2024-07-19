@@ -2,16 +2,6 @@ import nodemailer from "nodemailer";
 import SMTPTransport from "nodemailer/lib/smtp-transport";
 import Mail from "nodemailer/lib/mailer";
 
-
-const transport = nodemailer.createTransport({
-  host: process.env.NEXT_PUBLIC_SMTP_HOST,
-  port: parseInt(process.env.NEXT_PUBLIC_SMTP_PORT || "465"),
-  auth: {
-    user: process.env.NEXT_PUBLIC_SELLER_EMAIL_ADDRESS,
-    pass: process.env.NEXT_PUBLIC_NODEMAILER_PASSWORD,
-  },
-} as SMTPTransport.Options);
-
 type UserSendEmailDto = {
   sender: Mail.Address;
   receipients: string;
@@ -20,6 +10,15 @@ type UserSendEmailDto = {
 };
 
 export const SendToUser = async (dto: UserSendEmailDto) => {
+  const transport = nodemailer.createTransport({
+    host: process.env.NEXT_PUBLIC_SMTP_HOST,
+    port: parseInt(process.env.NEXT_PUBLIC_SMTP_PORT || "465"),
+    auth: {
+      user: process.env.NEXT_PUBLIC_SELLER_EMAIL_ADDRESS,
+      pass: process.env.NEXT_PUBLIC_NODEMAILER_PASSWORD,
+    },
+  } as SMTPTransport.Options);
+
   const { sender, receipients, subject, message } = dto;
 
   await new Promise((resolve, reject) => {
@@ -51,27 +50,23 @@ export const SendToUser = async (dto: UserSendEmailDto) => {
         }
       );
     });
-
-  })
-
-
-  
-};
-
-type SellerSendEmailDto = {
-  sender: Mail.Address;
-  receipient: string;
-  subject: string;
-  message: string;
-};
-
-export const sendToSeller = async (dto: SellerSendEmailDto) => {
-  const { sender, receipient, subject, message } = dto;
-
-  return await transport.sendMail({
-    from: sender,
-    to: receipient,
-    subject,
-    html: message,
   });
 };
+
+// type SellerSendEmailDto = {
+//   sender: Mail.Address;
+//   receipient: string;
+//   subject: string;
+//   message: string;
+// };
+
+// export const sendToSeller = async (dto: SellerSendEmailDto) => {
+//   const { sender, receipient, subject, message } = dto;
+
+//   return await transport.sendMail({
+//     from: sender,
+//     to: receipient,
+//     subject,
+//     html: message,
+//   });
+// };
