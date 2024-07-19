@@ -19,7 +19,7 @@ const transport = nodemailer.createTransport({
     message: string
   }
 
-export const sendToUser = async (dto: UserSendEmailDto) => {
+export const SendToUser = async (dto: UserSendEmailDto) => {
     const {sender, receipients, subject, message} = dto;
 
     return await transport.sendMail({

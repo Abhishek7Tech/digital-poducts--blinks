@@ -16,7 +16,7 @@ import {
   SystemProgram,
   Transaction,
 } from "@solana/web3.js";
-import { sendToSeller, sendToUser } from "@/app/api/email/route";
+import { sendToSeller, SendToUser } from "@/app/email/route";
 
 export const GET = async (request: Request) => {
   try {
@@ -203,7 +203,7 @@ export const POST = async (request: Request) => {
                                     </div>
                                     `;
 
-              const response = await sendToUser({
+              const response = await SendToUser({
                 sender,
                 receipients: email,
                 subject: productName,
