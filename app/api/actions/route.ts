@@ -209,10 +209,10 @@ export const POST = async (request: Request) => {
                 subject: productName,
                 message: messageTemplate,
               });
-              console.log("RESPONSE ACCEPTED", response.accepted);
-              console.log("RESPONSE REJECTED", response.rejected);
+              // console.log("RESPONSE ACCEPTED", response.accepted);
+              // console.log("RESPONSE REJECTED", response.rejected);
 
-              return Response.json(response.accepted, {
+              return Response.json(response, {
                 headers: ACTIONS_CORS_HEADERS,
               });
             } catch (error) {
