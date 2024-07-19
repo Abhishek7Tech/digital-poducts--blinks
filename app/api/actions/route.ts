@@ -16,7 +16,7 @@ import {
   SystemProgram,
   Transaction,
 } from "@solana/web3.js";
-import { sendToUser } from "../email/route";
+import { sendToSeller, sendToUser } from "../email/route";
 
 export const GET = async (request: Request) => {
   try {
@@ -31,7 +31,7 @@ export const GET = async (request: Request) => {
         actions: [
           {
             label: "Buy e-book",
-            href: "/api/actions?amount=0.001&email={email}",
+            href: "/api/actions?amount=0.100&email={email}",
             parameters: [
               {
                 name: "email",
@@ -172,10 +172,11 @@ export const POST = async (request: Request) => {
         const sellAccountBalanceToSol = sellAccountBalance / LAMPORTS_PER_SOL;
 
         const senderEmail = process.env.NEXT_PUBLIC_SELLER_EMAIL_ADDRESS;
-        const nodeMailerPassword = process.env.NEXT_PUBLIC_NODEMAILER_PASSWORD;
+        // const nodeMailerPassword = process.env.NEXT_PUBLIC_NODEMAILER_PASSWORD;
         // PRODUCT DETAILS
         const productName = "How to sell digital products using blinks!";
-        const productLink = "/sell_digital_products_using_blinks.pdf";
+        const productLink =
+          "https://drive.google.com/file/d/1hmU_WTEgWe8_JT_8q-OTg3QkXTIRCJ8H/view?usp=drivesdk";
         const senderName = "sellwithblinks";
         connection.onAccountChange(sellerKey, async (acc) => {
           const currentSellerAccountBalance = acc.lamports / LAMPORTS_PER_SOL;
@@ -183,23 +184,18 @@ export const POST = async (request: Request) => {
             console.log("PAYMENT DONE BY", userKey.toString());
             // EMAIL FOR USER
             try {
-
-              if(!senderName || !senderEmail) return;
+              if (!senderName || !senderEmail) return;
               const sender = {
                 name: senderName,
                 address: senderEmail,
               };
 
-             
-
               const messageTemplate = `<div style={{ padding: '8px' }}>
                                         <p>Hello,</p>
                                         <p>Thank you for purchasing <strong>${productName}</strong> </p>
                                         <div style={{ padding: '8px 16px', display: 'flex', flexDirection: 'column' }}>
-                                            <p style={{ fontFamily: 'monospace' }}>You can download your e-book here: 👇</p>
-                                            <a href=${productLink} download style={{ margin: '4px auto' }}>
-                                                <button style={{ backgroundColor: '#3b82f6', color: 'white', padding: '4px 8px' }}>Click here</button>
-                                            </a>
+                                            <p style={{ fontFamily: 'monospace' }}>You can download your e-book here 👉: <a href=${productLink} download style={{ margin: '4px auto' }}>click here</a> </p>
+                                            
                                         </div>
                                         <p>Thank you once again for your purchase!</p>
                                         <p>If you have any questions or need further assistance, reach us out at <strong>${senderEmail}</strong>.</p>
@@ -208,12 +204,18 @@ export const POST = async (request: Request) => {
                                     </div>
                                     `;
 
-              const response = await sendToUser({sender, receipients: email,subject: productName, message: messageTemplate})
+              const response = await sendToUser({
+                sender,
+                receipients: email,
+                subject: productName,
+                message: messageTemplate,
+              });
               console.log("RESPONSE ACCEPTED", response.accepted);
               console.log("RESPONSE REJECTED", response.rejected);
 
-              return Response.json(response.accepted, {headers: ACTIONS_CORS_HEADERS})
-
+              return Response.json(response.accepted, {
+                headers: ACTIONS_CORS_HEADERS,
+              });
             } catch (error) {
               Response.json("Failed to send ebook.", {
                 status: 400,
@@ -221,6 +223,45 @@ export const POST = async (request: Request) => {
               });
             }
             //EMAIL FOR SELLER
+
+            try {
+              if (!senderName || !senderEmail) return;
+              const sender = {
+                name: senderName,
+                address: senderEmail,
+              };
+
+              const messageTemplate = `<div style={{ padding: '8px' }}>
+                                        <p>Hello,</p>
+                                        <p>Your digital product <strong>${productName}</strong> made a sale.</p>
+                                        <div style={{ padding: '8px 16px', display: 'flex', flexDirection: 'column' }}>
+                                            <p style={{ fontFamily: 'monospace' }}>You can find the user details below 👇:</p>
+                                            <p><strong>User email :</strong> <strong>${email}</strong>
+                                            <p><strong>User wallet address : </strong> <strong>${requestBody.account}</strong>
+                                        </div>
+                                        <p>Congratulations! 🥳</p>
+                                        
+                                    </div>
+                                    `;
+              const subject = "You made a sale. 🥳🥳";
+
+              const response = await sendToSeller({
+                sender,
+                receipient: senderEmail,
+                subject,
+                message: messageTemplate,
+              });
+
+              return Response.json(response.accepted, {
+                headers: ACTIONS_CORS_HEADERS,
+              });
+
+            } catch (error) {
+              Response.json("Failed to send sale notification.", {
+                status: 400,
+                headers: ACTIONS_CORS_HEADERS,
+              });
+            }
           }
         });
       } catch (error) {
