@@ -10,16 +10,18 @@ type UserSendEmailDto = {
   message: string;
 };
 
+const transport = nodemailer.createTransport({
+service:"gmail",
+port: parseInt(process.env.NEXT_PUBLIC_SMTP_PORT || "465"),
+  host: process.env.NEXT_PUBLIC_SMTP_HOST,
+  auth: {
+    user: process.env.NEXT_PUBLIC_SELLER_EMAIL_ADDRESS,
+    pass: process.env.NEXT_PUBLIC_NODEMAILER_PASSWORD,
+  },
+  secure: true
+} as SMTPTransport.Options);
+
 export const SendToUser = async (dto: UserSendEmailDto) => {
-  const transport = nodemailer.createTransport({
-  service:"gmail",
-    // host: process.env.NEXT_PUBLIC_SMTP_HOST,
-    // port: parseInt(process.env.NEXT_PUBLIC_SMTP_PORT || "465"),
-    auth: {
-      user: process.env.NEXT_PUBLIC_SELLER_EMAIL_ADDRESS,
-      pass: process.env.NEXT_PUBLIC_NODEMAILER_PASSWORD,
-    },
-  } as SMTPTransport.Options);
 
   const { sender, receipients, subject, message } = dto;
 
@@ -50,6 +52,7 @@ export const SendToUser = async (dto: UserSendEmailDto) => {
 
           } else {
             resolve(info);
+            console.log("RESOLVED", info)
             return Response.json("Delivered", {headers: ACTIONS_CORS_HEADERS})
           }
         }
