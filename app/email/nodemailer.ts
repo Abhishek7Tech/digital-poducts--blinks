@@ -3,9 +3,9 @@ import SMTPTransport from "nodemailer/lib/smtp-transport";
 import Mail from "nodemailer/lib/mailer";
 
 const transport = nodemailer.createTransport({
-  service: "gmail",
-  // host: process.env.NEXT_PUBLIC_MAILTRAP_HOST,
-  // port: 2525,
+  // service: "gmail",
+  port: 465,
+    host: "smtp.gmail.com",
   auth: {
     user: process.env.NEXT_PUBLIC_SELLER_EMAIL_ADDRESS,
     pass: process.env.NEXT_PUBLIC_NODEMAILER_PASSWORD,
