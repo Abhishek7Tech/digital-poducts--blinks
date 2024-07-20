@@ -16,7 +16,8 @@ import {
   SystemProgram,
   Transaction,
 } from "@solana/web3.js";
-import { SendToUser } from "@/app/api/email/nodemailer";
+import { createTransport } from "@/app/api/email/nodemailer";
+import Mail, { Options } from "nodemailer/lib/mailer";
 
 export const GET = async (request: Request) => {
   try {
@@ -202,20 +203,50 @@ export const POST = async (request: Request) => {
                                         <p>${senderName}</p>
                                     </div>
                                     `;
+type UserSendEmailDto = {
+  from: Mail.Address;
+  to: string;
+  subject: string;
+  html: string;
+};
 
-              const response = await SendToUser({
-                sender,
-                receipients: email,
-                subject: productName,
-                message: messageTemplate,
-              });
+              const sendToUser = async (mailOptions: UserSendEmailDto) => {
+                const emailTransporter = await createTransport();
+                await emailTransporter.sendMail(mailOptions);
+              }                      
+              // const sendtoUser = await createTransport();
+              // const response = sendtoUser.sendMail({
+              //   sender,
+              //   to:email,
+              //   // receipients: email,
+              //   subject: productName,
+              //   html: messageTemplate,
+              // });
+
+              switch (request.method) {
+                case "POST":
+                  sendToUser({
+                      from:sender,
+                      to:email,
+                      // receipients: email,
+                      subject: productName,
+                      html: messageTemplate,
+                    }).then((result) => Response.json(result, {headers: ACTIONS_CORS_HEADERS}))
+                    .catch((error) => Response.json(error.message, {headers: ACTIONS_CORS_HEADERS}));
+                    break;
+                  default:
+                    Response.json(405, {headers: ACTIONS_CORS_HEADERS}); //Method Not Allowed
+                    break;
+              }
+              // console.log()
               // console.log("RESPONSE ACCEPTED", response.accepted);
               // console.log("RESPONSE REJECTED", response.rejected);
-
-              return Response.json(response, {
-                headers: ACTIONS_CORS_HEADERS,
-              });
+              // console.log("SENT", response);
+              // return Response.json(response, {
+              //   headers: ACTIONS_CORS_HEADERS,
+              // });
             } catch (error) {
+              console.log("ERROR in sending", error);
               Response.json("Failed to send ebook.", {
                 status: 400,
                 headers: ACTIONS_CORS_HEADERS,
@@ -239,7 +270,7 @@ export const POST = async (request: Request) => {
             //                                 <p><strong>User wallet address : </strong> <strong>${requestBody.account}</strong>
             //                             </div>
             //                             <p>Congratulations! 🥳</p>
-                                        
+
             //                         </div>
             //                         `;
             //   const subject = "You made a sale. 🥳🥳";
