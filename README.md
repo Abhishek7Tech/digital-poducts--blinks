@@ -66,7 +66,7 @@ Make sure you have the following installed:
    - Add the user's email address.
    - Switch your wallet to Devnet.
    - Confirm the payment.
-   - Check your email for confirmation.
+   - Ask user to check their email.
 
 ## Troubleshooting
 
@@ -74,7 +74,7 @@ If you encounter any issues, please follow the steps again or reach out for supp
 
 ## Support
 
-If you have any inquiries or queries, reach out to me on Twitter: [@Abhishek7Tech](https://twitter.com/Abhishek7Tech)
+If you have any queries, reach out to me on Twitter: [@Abhishek7Tech](https://twitter.com/Abhishek7Tech)
 
 ---
 
