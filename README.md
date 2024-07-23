@@ -1,36 +1,81 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+Sure! Here is the updated README for a Next.js project setup:
 
-## Getting Started
+# Digital Products Blinks Setup Guide
 
-First, run the development server:
+## Overview
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+This guide will help you set up the Digital Products Blinks project on your local machine using Next.js. Follow the steps below to get started.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Prerequisites
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Make sure you have the following installed:
+- Node.js
+- Git
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+## Setup Instructions
 
-## Learn More
+1. **Clone the Project**
 
-To learn more about Next.js, take a look at the following resources:
+   First, clone the project repository from GitHub:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+   ```bash
+   git clone <https://github.com/Abhishek7Tech/digital-poducts--blinks.git>
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+2. **Change Directory**
 
-## Deploy on Vercel
+   Navigate to the project directory:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+   ```bash
+   cd digital-products--blinks
+   ```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+3. **Set Environment Variables**
+
+   Create a `.env` file in the root of the project and add the following environment variables:
+
+   ```env
+   NEXT_PUBLIC_SELLER_PUBLIC_KEY=PUBLIC ADDRESS OF THE SELLER WALLET
+   NEXT_PUBLIC_SELLER_EMAIL_ADDRESS=SELLER ADDRESS TO SEND EMAIL TO USERS
+   NEXT_PUBLIC_NODEMAILER_PASSWORD="CREATE APP BASED PASSWORD FOR GOOGLE TO LET NODEMAILER SEND EMAIL TO USERS"
+   ```
+
+   Replace the placeholder values with your actual details.
+
+4. **Install Dependencies**
+
+   Install the necessary dependencies by running:
+
+   ```bash
+   npm install
+   ```
+
+5. **Start the Development Server**
+
+   Start the development server:
+
+   ```bash
+   npm run dev
+   ```
+
+6. **Set Up Dialect**
+
+   Go to [Dialect](https://dial.to/devnet).
+
+   - Paste `http://localhost:3000/api/actions` in the appropriate field.
+   - Add the user's email address.
+   - Switch your wallet to Devnet.
+   - Confirm the payment.
+   - Check your email for confirmation.
+
+## Troubleshooting
+
+If you encounter any issues, please follow the steps again or reach out for support.
+
+## Support
+
+If you have any inquiries or queries, reach out to me on Twitter: [@Abhishek7Tech](https://twitter.com/Abhishek7Tech)
+
+---
+
+By following these steps, you should have the Digital Products Blinks project up and running on your local machine. Enjoy developing!

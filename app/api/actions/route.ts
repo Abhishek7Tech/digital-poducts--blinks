@@ -1,4 +1,3 @@
-import { EmailTemplate } from "@/app/components/email-template";
 import {
   ActionGetResponse,
   ActionPostRequest,
@@ -9,15 +8,12 @@ import {
 import {
   clusterApiUrl,
   Connection,
-  Keypair,
   LAMPORTS_PER_SOL,
   PublicKey,
-  sendAndConfirmTransaction,
   SystemProgram,
   Transaction,
 } from "@solana/web3.js";
 import { createTransport } from "@/app/api/email/nodemailer";
-import Mail, { Options } from "nodemailer/lib/mailer";
 import { message, UserSendEmailDto } from "../email/email-helpers";
 import {
   customErrorMessage,
@@ -60,7 +56,6 @@ export const OPTIONS = GET;
 export const POST = async (request: Request) => {
   try {
     const requestUrl = new URL(request.url);
-    // const sellerEmail = process.env.NEXT_PUBLIC_SELLER_EMAIL_ADDRESS;
 
     let amount: string | null = requestUrl.searchParams.get("amount");
     let email: string | null = requestUrl.searchParams.get("email");
