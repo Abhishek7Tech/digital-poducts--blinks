@@ -13,6 +13,7 @@ import {
   SystemProgram,
   Transaction,
 } from "@solana/web3.js";
+import { Email } from "@/app/components/email-template";
 import { createTransport } from "@/app/api/email/nodemailer";
 import { message, UserSendEmailDto } from "../email/email-helpers";
 import {
@@ -20,6 +21,8 @@ import {
   errorMessage,
   isValidEmail,
 } from "@/app/utils/helper";
+import Plunk from "@plunk/node";
+import { render } from "@react-email/render";
 export const GET = async (request: Request) => {
   try {
     const requestURL = new URL(request.url);
@@ -157,45 +160,75 @@ export const POST = async (request: Request) => {
             console.log("PAYMENT DONE BY", userKey.toString());
             // EMAIL FOR USER
             try {
-              if (!senderName || !senderEmail) return;
-              const sender = {
-                name: senderName,
-                address: senderEmail,
+              if (
+                !senderName ||
+                !senderEmail ||
+                !process.env.NEXT_PUBLIC_PLUNK_API_KEY
+              )
+                return;
+              const message = `<p>Hello,</p>
+              <p>Thank you for purchasing <strong> How sell digital products using Blinks!</strong></p>
+              <p>You can download your e-book here 👉: <a style="color: blue" href=${"https://drive.google.com/file/d/1hmU_WTEgWe8_JT_8q-OTg3QkXTIRCJ8H/view?usp=drivesdk"}>Click here</a></p>
+              <p>Thank you once again for your purchase!</p>
+              <p>If you have any questions or need further assistance, reach us out at <strong>sellwithblinks@gmail.com</strong></p>
+              <p>Best wishes,</p>
+              <p>sellwithblinks</p>`;
+              // const plunk = new Plunk()
+              const options = {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${process.env.NEXT_PUBLIC_PLUNK_API_KEY}`,
+                },
+                body: JSON.stringify({
+                  "to": email,
+                  "subject": "How to sell digital products using Blinks!",
+                  "body": message
+                }),
               };
 
-              const messageTemplate = message(
-                productName,
-                senderName,
-                productLink,
-                senderEmail
-              );
+              fetch("https://api.useplunk.com/v1/send", options)
+                .then((response) => response.json())
+                .then((response) => console.log("RES",response));
+              // const body =
+              // const sender = {
+              //   name: senderName,
+              //   address: senderEmail,
+              // };
 
-              const sendToUser = async (mailOptions: UserSendEmailDto) => {
-                const emailTransporter = await createTransport();
-                await emailTransporter.sendMail(mailOptions);
-              };
+              // const messageTemplate = message(
+              //   productName,
+              //   senderName,
+              //   productLink,
+              //   senderEmail
+              // );
 
-              switch (request.method) {
-                case "POST":
-                  sendToUser({
-                    from: sender,
-                    to: email,
-                    subject: productName,
-                    html: messageTemplate,
-                  })
-                    .then((result) =>
-                      Response.json(result, { headers: ACTIONS_CORS_HEADERS })
-                    )
-                    .catch((error) =>
-                      Response.json(error.message, {
-                        headers: ACTIONS_CORS_HEADERS,
-                      })
-                    );
-                  break;
-                default:
-                  Response.json(405, { headers: ACTIONS_CORS_HEADERS }); //Method Not Allowed
-                  break;
-              }
+              // const sendToUser = async (mailOptions: UserSendEmailDto) => {
+              //   const emailTransporter = await createTransport();
+              //   await emailTransporter.sendMail(mailOptions);
+              // };
+
+              // switch (request.method) {
+              //   case "POST":
+              //     sendToUser({
+              //       from: sender,
+              //       to: email,
+              //       subject: productName,
+              //       html: messageTemplate,
+              //     })
+              //       .then((result) =>
+              //         Response.json(result, { headers: ACTIONS_CORS_HEADERS })
+              //       )
+              //       .catch((error) =>
+              //         Response.json(error.message, {
+              //           headers: ACTIONS_CORS_HEADERS,
+              //         })
+              //       );
+              //     break;
+              //   default:
+              //     Response.json(405, { headers: ACTIONS_CORS_HEADERS }); //Method Not Allowed
+              //     break;
+              // }
             } catch (error) {
               return customErrorMessage("Falied to send ebook.");
             }
