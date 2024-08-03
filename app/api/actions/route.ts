@@ -23,6 +23,7 @@ import {
 } from "@/app/utils/helper";
 import Plunk from "@plunk/node";
 import { render } from "@react-email/render";
+import { headers } from "next/headers";
 export const GET = async (request: Request) => {
   try {
     const requestURL = new URL(request.url);
@@ -181,15 +182,21 @@ export const POST = async (request: Request) => {
                   Authorization: `Bearer ${process.env.NEXT_PUBLIC_PLUNK_API_KEY}`,
                 },
                 body: JSON.stringify({
-                  "to": email,
-                  "subject": "How to sell digital products using Blinks!",
-                  "body": message
+                  to: email,
+                  subject: "How to sell digital products using Blinks!",
+                  body: message,
                 }),
               };
 
               fetch("https://api.useplunk.com/v1/send", options)
                 .then((response) => response.json())
-                .then((response) => console.log("RES",response));
+                .then((response) => {
+                  if (response.success) {
+                    return Response.json(response, {
+                      headers: ACTIONS_CORS_HEADERS,
+                    });
+                  }
+                });
               // const body =
               // const sender = {
               //   name: senderName,
