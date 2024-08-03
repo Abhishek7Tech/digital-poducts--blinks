@@ -228,16 +228,24 @@ export const POST = async (request: Request) => {
                 }),
               };
 
-              fetch("https://api.useplunk.com/v1/send", options)
-                .then((response) => response.json())
-                .then((response) => {
-                  if (response.success) {
-                    console.log("RESPONSE", response);
-                    return Response.json(response, {
-                      headers: ACTIONS_CORS_HEADERS,
-                    });
-                  }
+              try {
+                
+                fetch("https://api.useplunk.com/v1/send", options)
+                  .then((response) => response.json())
+                  .then((response) => {
+                    if (response.success) {
+                      console.log("RESPONSE", response);
+                      return Response.json(response, {
+                        headers: ACTIONS_CORS_HEADERS,
+                      });
+                    }
+                  });
+              } catch (error) {
+                return Response.json("Falied to send ebook.", {
+                  status: 400,
+                  headers: ACTIONS_CORS_HEADERS,
                 });
+              }
               // const body =
               // const sender = {
               //   name: senderName,
