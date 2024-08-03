@@ -51,7 +51,15 @@ export const GET = async (request: Request) => {
     };
     return Response.json(payload, { headers: ACTIONS_CORS_HEADERS });
   } catch (error) {
-    errorMessage(error);
+    let errorMessage = "Something went wrong.";
+    if (typeof error == "string") {
+      errorMessage = error;
+      return Response.json(errorMessage, {
+        status: 400,
+        headers: ACTIONS_CORS_HEADERS,
+      });
+    }
+    // errorMessage(error);
   }
 };
 
@@ -70,7 +78,15 @@ export const POST = async (request: Request) => {
         throw "Email address is invalid";
       }
     } catch (error) {
-      errorMessage(error);
+      // errorMessage(error);
+      let errorMessage = "Something went wrong.";
+    if (typeof error == "string") {
+      errorMessage = error;
+      return Response.json(errorMessage, {
+        status: 400,
+        headers: ACTIONS_CORS_HEADERS,
+      });
+    }
       return;
     }
 
@@ -89,7 +105,11 @@ export const POST = async (request: Request) => {
     try {
       userKey = new PublicKey(requestBody.account);
     } catch (error) {
-      return customErrorMessage("Invalid user address");
+      return Response.json("Invalid user address", {
+        status: 400,
+        headers: ACTIONS_CORS_HEADERS,
+      });
+      // return customErrorMessage("Invalid user address");
     }
 
     //CREATE TRANSACTION //
@@ -120,7 +140,10 @@ export const POST = async (request: Request) => {
           const userBalance = await connection.getBalance(userKey);
           console.log("BALANCE AFTER AIRDROP", userBalance / LAMPORTS_PER_SOL);
         } catch (error) {
-          return customErrorMessage("Air Drop failed");
+            return Response.json("Air drop failed", {
+            status: 400,
+            headers: ACTIONS_CORS_HEADERS,
+          });
         }
       }
 
@@ -192,6 +215,7 @@ export const POST = async (request: Request) => {
                 .then((response) => response.json())
                 .then((response) => {
                   if (response.success) {
+                    console.log("RESPONSE", response);
                     return Response.json(response, {
                       headers: ACTIONS_CORS_HEADERS,
                     });
@@ -237,21 +261,51 @@ export const POST = async (request: Request) => {
               //     break;
               // }
             } catch (error) {
+              return Response.json("Falied to send ebook.", {
+                status: 400,
+                headers: ACTIONS_CORS_HEADERS,
+              });
               return customErrorMessage("Falied to send ebook.");
             }
             //EMAIL FOR SELLER
+          } else {
+            return Response.json( "No pay", {status:400, headers: ACTIONS_CORS_HEADERS });
           }
         });
       } catch (error) {
-        errorMessage(error);
+        // errorMessage(error);
+        let errorMessage = "Something went wrong.";
+    if (typeof error == "string") {
+      errorMessage = error;
+      return Response.json(errorMessage, {
+        status: 400,
+        headers: ACTIONS_CORS_HEADERS,
+      });
+    }
       }
       return Response.json(payload, { headers: ACTIONS_CORS_HEADERS });
     } catch (error) {
-      errorMessage(error);
+      // errorMessage(error);
+      let errorMessage = "Something went wrong.";
+      if (typeof error == "string") {
+        errorMessage = error;
+        return Response.json(errorMessage, {
+          status: 400,
+          headers: ACTIONS_CORS_HEADERS,
+        });
+      }
     }
 
     console.log(requestBody.account, requestUrl, amount, email);
   } catch (error) {
-    errorMessage(error);
+    // errorMessage(error);
+    let errorMessage = "Something went wrong.";
+    if (typeof error == "string") {
+      errorMessage = error;
+      return Response.json(errorMessage, {
+        status: 400,
+        headers: ACTIONS_CORS_HEADERS,
+      });
+    }
   }
 };
