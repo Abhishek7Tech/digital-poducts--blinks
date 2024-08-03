@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { EmailTemplate } from "./components/email-template";
+// import { EmailTemplate } from "./components/email-template";
 
 export default function Home() {
   return (
