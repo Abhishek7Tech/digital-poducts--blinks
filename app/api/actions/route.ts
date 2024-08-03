@@ -68,14 +68,18 @@ export const OPTIONS = GET;
 export const POST = async (request: Request) => {
   try {
     const requestUrl = new URL(request.url);
-
+    
     let amount: string | null = requestUrl.searchParams.get("amount");
     let email: string | null = requestUrl.searchParams.get("email");
     const sellerPubKey: string | undefined =
       process.env.NEXT_PUBLIC_SELLER_PUBLIC_KEY;
     try {
       if (!email || !amount) {
-        throw "Email address is invalid";
+        return Response.json("Invalid address.", {
+          status: 400,
+          headers: ACTIONS_CORS_HEADERS,
+        });
+        // throw "Email address is invalid";
       }
     } catch (error) {
       // errorMessage(error);
@@ -95,7 +99,11 @@ export const POST = async (request: Request) => {
     const isEmailValid = isValidEmail(email);
 
     if (!isEmailValid) {
-      throw "Invalid email.";
+      return Response.json("Invalid address.", {
+        status: 400,
+        headers: ACTIONS_CORS_HEADERS,
+      });
+      // throw "Invalid email.";
     }
 
     const requestBody: ActionPostRequest = await request.json();
@@ -117,7 +125,11 @@ export const POST = async (request: Request) => {
       let sellerKey: PublicKey;
 
       if (!sellerPubKey) {
-        throw "Invalid seller address";
+        return Response.json("Invalid address.", {
+          status: 400,
+          headers: ACTIONS_CORS_HEADERS,
+        });
+        // throw "Invalid seller address";
       }
 
       sellerKey = new PublicKey(sellerPubKey);
