@@ -68,7 +68,7 @@ export const OPTIONS = GET;
 export const POST = async (request: Request) => {
   try {
     const requestUrl = new URL(request.url);
-    
+
     let amount: string | null = requestUrl.searchParams.get("amount");
     let email: string | null = requestUrl.searchParams.get("email");
     const sellerPubKey: string | undefined =
@@ -84,13 +84,13 @@ export const POST = async (request: Request) => {
     } catch (error) {
       // errorMessage(error);
       let errorMessage = "Something went wrong.";
-    if (typeof error == "string") {
-      errorMessage = error;
-      return Response.json(errorMessage, {
-        status: 400,
-        headers: ACTIONS_CORS_HEADERS,
-      });
-    }
+      if (typeof error == "string") {
+        errorMessage = error;
+        return Response.json(errorMessage, {
+          status: 400,
+          headers: ACTIONS_CORS_HEADERS,
+        });
+      }
       return;
     }
 
@@ -152,7 +152,7 @@ export const POST = async (request: Request) => {
           const userBalance = await connection.getBalance(userKey);
           console.log("BALANCE AFTER AIRDROP", userBalance / LAMPORTS_PER_SOL);
         } catch (error) {
-            return Response.json("Air drop failed", {
+          return Response.json("Air drop failed", {
             status: 400,
             headers: ACTIONS_CORS_HEADERS,
           });
@@ -186,7 +186,7 @@ export const POST = async (request: Request) => {
 
         const senderEmail = process.env.NEXT_PUBLIC_SELLER_EMAIL_ADDRESS;
         // PRODUCT DETAILS
-        const productName = "How to sell digital products using blinks!";
+        const productName = "How sell digital products using Blinks!";
         const productLink =
           "https://drive.google.com/file/d/1hmU_WTEgWe8_JT_8q-OTg3QkXTIRCJ8H/view?usp=drivesdk";
         const senderName = "sellwithblinks";
@@ -200,11 +200,16 @@ export const POST = async (request: Request) => {
                 !senderName ||
                 !senderEmail ||
                 !process.env.NEXT_PUBLIC_PLUNK_API_KEY
-              )
-                return;
+              ) {
+                return Response.json("Invalid credentials", {
+                  status: 400,
+                  headers: ACTIONS_CORS_HEADERS,
+                });
+              }
+
               const message = `<p>Hello,</p>
-              <p>Thank you for purchasing <strong> How sell digital products using Blinks!</strong></p>
-              <p>You can download your e-book here 👉: <a style="color: blue" href=${"https://drive.google.com/file/d/1hmU_WTEgWe8_JT_8q-OTg3QkXTIRCJ8H/view?usp=drivesdk"}>Click here</a></p>
+              <p>Thank you for purchasing <strong> ${productName}</strong></p>
+              <p>You can download your e-book here 👉: <a style="color: blue" href=${productLink}>Click here</a></p>
               <p>Thank you once again for your purchase!</p>
               <p>If you have any questions or need further assistance, reach us out at <strong>sellwithblinks@gmail.com</strong></p>
               <p>Best wishes,</p>
@@ -281,19 +286,22 @@ export const POST = async (request: Request) => {
             }
             //EMAIL FOR SELLER
           } else {
-            return Response.json( "No pay", {status:400, headers: ACTIONS_CORS_HEADERS });
+            return Response.json("No pay", {
+              status: 400,
+              headers: ACTIONS_CORS_HEADERS,
+            });
           }
         });
       } catch (error) {
         // errorMessage(error);
         let errorMessage = "Something went wrong.";
-    if (typeof error == "string") {
-      errorMessage = error;
-      return Response.json(errorMessage, {
-        status: 400,
-        headers: ACTIONS_CORS_HEADERS,
-      });
-    }
+        if (typeof error == "string") {
+          errorMessage = error;
+          return Response.json(errorMessage, {
+            status: 400,
+            headers: ACTIONS_CORS_HEADERS,
+          });
+        }
       }
       return Response.json(payload, { headers: ACTIONS_CORS_HEADERS });
     } catch (error) {
